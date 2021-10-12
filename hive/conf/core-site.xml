@@ -1,0 +1,14 @@
+<configuration>
+    <property>
+    <name>fs.AbstractFileSystem.gs.impl</name>
+        <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS</value>
+    </property>
+    <property>
+        <name>google.cloud.auth.service.account.enable</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>google.cloud.auth.service.account.json.keyfile</name>
+        <value>/tmp/serviceaccount.json</value>
+    </property>
+</configuration>
