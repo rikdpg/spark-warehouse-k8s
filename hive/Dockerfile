@@ -26,7 +26,10 @@ RUN wget https://downloads.mysql.com/archives/get/p/3/file/mysql-connector-java-
 # TODO: tidy up the location of the jar
 RUN wget https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop3-latest.jar
 
+RUN wget -P /opt/hive/lib https://jdbc.postgresql.org/download/postgresql-42.3.1.jar
+
 COPY entrypoint.sh entrypoint.sh
+COPY conf /opt/conf
 
 EXPOSE 10000
 

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# TODO: set condition on init metastore schema
-
 set -e
 echo "Setting Env variables"
 
@@ -12,5 +10,16 @@ export HIVE_CONF_DIR="/opt/conf"
 export HADOOP_CLASSPATH="$HADOOP_CLASSPATH:/tmp/gcs-connector-hadoop3-latest.jar"
 
 export PATH="$HIVE_HOME/bin:$HADOOP_HOME:$PATH"
+
+echo "Validating metastore schema..."
+schema_validation=$(schematool -validate -dbType postgres)
+
+if ! schema_validation; then
+    echo "Initializing db with schema..."
+    schematool -initSchema -dbType postgres
+else
+    echo "Valid metastore schema..."
+
+fi
 
 exec "$@"

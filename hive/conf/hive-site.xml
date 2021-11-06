@@ -5,18 +5,19 @@
     </property>
     <property>
       <name>javax.jdo.option.ConnectionDriverName</name>
-      <value>com.mysql.cj.jdbc.Driver</value>
+      <!-- <value>com.mysql.cj.jdbc.Driver</value> -->
+      <value>org.postgresql.Driver</value>
     </property>
     <property>
         <name>javax.jdo.option.ConnectionURL</name>
-        <value>jdbc:mysql://warehouse-mysql-1/metastore?createDatabaseIfNotExist=true</value>
+        <value>jdbc:postgresql://postgres-db-lb:5432/postgres?createDatabaseIfNotExist=true</value>
     </property>
     <property>
         <name>javax.jdo.option.ConnectionUserName</name>
-        <value>hive</value>
+        <value>postgres</value>
     </property>
     <property>
         <name>javax.jdo.option.ConnectionPassword</name>
-        <value>hive1234</value>
+        <value>testpassword</value>
     </property> 
 </configuration>

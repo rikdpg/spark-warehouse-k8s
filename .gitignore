@@ -1,3 +1,6 @@
 *.json
 mysql/data/*
 hive/warehouse/*
+spark/*
+src/*
+.venv
