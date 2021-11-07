@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-server
+spec:
+  selector:
+    matchLabels:
+      app: spark
+  template:
+    metadata:
+      labels:
+        app: spark
+    spec:
+      initContainers:
+        - name: check
+          image: busybox
+          command: ["/bin/sh"]
+          args: ["-c", "echo ${HIVE_USER_PWD}"]
+          env:
+            - name: HIVE_USER_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: hive
+                  key: password
+      containers:
+        - name: spark-thrift
+          image: spark-thrift-server:0.1.0

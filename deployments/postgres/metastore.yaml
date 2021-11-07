@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metastore
+spec:
+  selector:
+    matchLabels:
+      app: metastore
+  template:
+    metadata:
+      labels:
+        app: metastore
+    spec: 
+      containers:
+        - name: metastore
+          image: mysql:latest
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: initdb
+              mountPath: /docker-entrypoint-initdb.d
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql
+                  key: password
+            - name: HIVE_USER_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: hive
+                  key: password
+      volumes:
+        - name: initdb
+          configMap:
+            name: metastore-initdb        
