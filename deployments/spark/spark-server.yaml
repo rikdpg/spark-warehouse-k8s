@@ -1,27 +1,64 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spark-server
+  name: spark-thrift
 spec:
   selector:
     matchLabels:
-      app: spark
+      app: spark-thrift
   template:
     metadata:
       labels:
-        app: spark
+        app: spark-thrift
     spec:
-      initContainers:
-        - name: check
-          image: busybox
-          command: ["/bin/sh"]
-          args: ["-c", "echo ${HIVE_USER_PWD}"]
+      containers:
+        - name: spark-thrift
+          image: spark-thrift-server:0.1.0
+          args:
+            - /bin/bash
+            - -c
+            - tail -F /dev/null
+            # - nohup
+            # - /opt/spark/sbin/start-thriftserver.sh 
+            #   --master k8s://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT} 
+            #   --conf spark.kubernetes.container.image=spark:1.0.0 
+            #   --conf spark.kubernetes.executor.secrets.google-credentials=/etc/google 
+            #   --conf spark.kubernetes.authenticate.driver.serviceAccountName=default 
+            #   --conf spark.driver.extraClassPath=/opt/hive/lib/mysql-connector-java-8.0.26.jar 
+            #   --hiveconf javax.jdo.option.ConnectionPassword=${HIVE_USER_PWD} 
+            #   --conf spark.driver.host=$(hostname -I) 
+            #   --conf spark.sql.warehouse.dir=/opt/spark-warehouse 
+            #   --packages com.google.cloud.bigdataoss:gcs-connector:hadoop3-2.2.0 
+            #   --conf spark.jars=/tmp/gcs-connector-hadoop3-latest.jar
+
+          volumeMounts:
+            - name: google-credentials
+              mountPath: /etc/google
+          ports:
+            - containerPort: 10000
+            - containerPort: 4040
           env:
             - name: HIVE_USER_PWD
               valueFrom:
                 secretKeyRef:
                   name: hive
                   key: password
-      containers:
-        - name: spark-thrift
-          image: spark-thrift-server:0.1.0
+      volumes:
+        - name: google-credentials
+          secret:
+            secretName: google-credentials
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-thrift
+spec:
+  selector:
+    app: spark-thrift
+  ports:
+    - port: 10000
+      name: thrift
+      targetPort: 10000
+    - port: 4040
+      name: ui
+      targetPort: 4040

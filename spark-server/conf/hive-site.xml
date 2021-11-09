@@ -1,23 +1,35 @@
 <configuration>
     <property>
-        <name>hive.metastore.warehouse.dir</name>
-        <value>/opt/data</value>
+        <name>hive.metastore.uris</name>
+        <value>thrift://metastore2:9083</value>
     </property>
+    <property> 
+        <name>hive.metastore.warehouse.dir</name> 
+        <value>file:///opt/spark-warehouse</value>
+    </property>
+    <property> 
+        <name>fs.default.name</name> 
+        <value>file:///opt/spark-warehouse</value> 
+    </property>    
     <property>
       <name>javax.jdo.option.ConnectionDriverName</name>
-      <!-- <value>com.mysql.cj.jdbc.Driver</value> -->
-      <value>org.postgresql.Driver</value>
+      <value>com.mysql.cj.jdbc.Driver</value>
     </property>
     <property>
         <name>javax.jdo.option.ConnectionURL</name>
-        <value>jdbc:postgresql://postgres-db-lb:5432/postgres?createDatabaseIfNotExist=true</value>
+        <value>jdbc:mysql://mysql:3306/metastore</value>
     </property>
     <property>
         <name>javax.jdo.option.ConnectionUserName</name>
-        <value>postgres</value>
+        <value>hive</value>
     </property>
     <property>
-        <name>javax.jdo.option.ConnectionPassword</name>
-        <value>testpassword</value>
+       <name>datanucleus.autoCreateSchema</name>
+       <value>false</value> 
     </property> 
+
+    <property>
+       <name>datanucleus.fixedDatastore</name>
+       <value>true</value>
+    </property>
 </configuration>
