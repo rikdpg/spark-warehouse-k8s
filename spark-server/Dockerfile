@@ -24,8 +24,9 @@ RUN wget -qO- https://downloads.mysql.com/archives/get/p/3/file/mysql-connector-
 RUN wget -qP /tmp https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop3-latest.jar
 
 COPY entrypoint.sh entrypoint.sh
-COPY conf/core-site.xml /opt/spark/conf/core-site.xml
-COPY conf/hive-site.xml /opt/spark/conf/hive-site.xml
+# COPY conf/core-site.xml /opt/spark/conf/core-site.xml
+# COPY conf/hive-site.xml /opt/spark/conf/hive-site.xml
+COPY conf /opt/spark/conf 
 
 EXPOSE 10000
 
