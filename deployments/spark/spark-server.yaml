@@ -34,6 +34,8 @@ spec:
           volumeMounts:
             - name: google-credentials
               mountPath: /etc/google
+            - name: warehouse-storage
+              mountPath: /opt/spark-warehouse
           ports:
             - containerPort: 10000
             - containerPort: 4040
@@ -47,6 +49,9 @@ spec:
         - name: google-credentials
           secret:
             secretName: google-credentials
+        - name: warehouse-storage
+          persistentVolumeClaim:  
+            claimName: spark-warehouse-claim
 ---
 apiVersion: v1
 kind: Service
