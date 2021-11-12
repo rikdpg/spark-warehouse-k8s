@@ -14,12 +14,10 @@ spec:
       containers:
         - name: spark-thrift
           image: spark-thrift-server:0.1.0
-          args:
-            - nohup bash -c '/opt/spark/sbin/start-thriftserver.sh 
-                --master k8s://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}
-                --hiveconf javax.jdo.option.ConnectionPassword=${HIVE_USER_PWD}
-                --conf spark.driver.host=$(hostname -I)
-                --packages com.google.cloud.bigdataoss:gcs-connector:hadoop3-2.2.0' &
+          command:
+            - /bin/bash
+            - -c
+            - ./entrypoint.sh
           volumeMounts:
             - name: google-credentials
               mountPath: /etc/google
