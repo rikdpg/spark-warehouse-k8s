@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-thrift
+spec:
+  selector:
+    matchLabels:
+      app: spark-thrift
+  template:
+    metadata:
+      labels:
+        app: spark-thrift
+    spec:
+      containers:
+        - name: spark-thrift
+          image: spark-thrift-server:0.1.0
+          command:
+            - /bin/bash
+            - -c
+            - ./entrypoint.sh
+          volumeMounts:
+            - name: google-credentials
+              mountPath: /etc/google
+            - name: warehouse-storage
+              mountPath: /opt/spark-warehouse
+          ports:
+            - containerPort: 10000
+            - containerPort: 4040
+          env:
+            - name: HIVE_USER_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: hive
+                  key: password
+      volumes:
+        - name: google-credentials
+          secret:
+            secretName: google-credentials
+        - name: warehouse-storage
+          persistentVolumeClaim:  
+            claimName: spark-warehouse-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-thrift
+spec:
+  selector:
+    app: spark-thrift
+  ports:
+    - port: 10000
+      name: thrift
+      targetPort: 10000
+    - port: 4040
+      name: ui
+      targetPort: 4040

@@ -1,3 +1,7 @@
 *.json
 mysql/data/*
 hive/warehouse/*
+spark/*
+src/*
+.venv
+deployments/secrets.yaml

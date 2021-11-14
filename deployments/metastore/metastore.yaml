@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metastore2
+spec:
+  selector:
+    matchLabels:
+      app: metastore2
+  template:
+    metadata:
+      labels:
+        app: metastore2
+    spec: 
+      # initContainer: nc -vz mysql 3306
+      containers:
+        - name: metastore2
+          image: spark-thrift-server:0.1.0
+          imagePullPolicy: Never
+          args:
+            - /bin/bash
+            - -c
+            - /opt/hive/bin/hive --service metastore --hiveconf javax.jdo.option.ConnectionPassword=${HIVE_USER_PWD}
+          ports:
+            - containerPort: 9083
+          env:
+            - name: HIVE_CONF_DIR
+              value: /opt/spark/conf
+            - name: HIVE_USER_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: hive
+                  key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metastore2
+spec:
+  selector:
+    app: metastore2
+  ports:
+    - port: 9083
+      targetPort: 9083 

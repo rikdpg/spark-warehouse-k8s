@@ -1,6 +1,11 @@
 <configuration>
     <property>
-    <name>fs.AbstractFileSystem.gs.impl</name>
+        <name>fs.gs.impl</name>
+        <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem</value>
+        <description>The FileSystem for gs: (GCS) uris.</description>
+    </property>
+    <property>
+        <name>fs.AbstractFileSystem.gs.impl</name>
         <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS</value>
     </property>
     <property>
@@ -9,6 +14,6 @@
     </property>
     <property>
         <name>google.cloud.auth.service.account.json.keyfile</name>
-        <value>/tmp/serviceaccount.json</value>
+        <value>/etc/google/credentials.json</value>
     </property>
 </configuration>
