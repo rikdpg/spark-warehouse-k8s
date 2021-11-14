@@ -24,14 +24,26 @@ spec:
             - name: warehouse-storage
               mountPath: /opt/spark-warehouse
           ports:
-            - containerPort: 10000
-            - containerPort: 4040
+            - name: thrift
+              containerPort: 10000
+            - name: spark-ui
+              containerPort: 4040
           env:
             - name: HIVE_USER_PWD
               valueFrom:
                 secretKeyRef:
                   name: hive
                   key: password
+          livenessProbe:
+            tcpSocket:
+              port: thrift
+            failureThreshold: 1
+            periodSeconds: 10
+          startupProbe:
+            tcpSocket:
+              port: thrift
+            failureThreshold: 6
+            periodSeconds: 20
       volumes:
         - name: google-credentials
           secret:
@@ -52,5 +64,5 @@ spec:
       name: thrift
       targetPort: 10000
     - port: 4040
-      name: ui
+      name: spark-ui
       targetPort: 4040
