@@ -1,13 +1,44 @@
-# Spark on Kubernetes
-Repositories contains Spark on Kubernetes implementation.
+# Spark Thrifterver on Kubernetes
+Executes SparkSql queries through thriftserver on Kubernetes. A generic setup used throughout personal data projects.
 
-## Spark base image
-Scheduling pods with a Spark image
-`/opt/spark/sbin/docker-image-tool.sh -t 1.0.0 -p /path/to/python/dockerfile`
+## Description
 
-## Hiveserver2 configuration
-The hiveserver2 is exposed through port 10000. Use DBeaver to connect.
+An apprach to run (my) SparkSql workload in a containerized way on Kubernetes. The setup follows a popular convention to leverage cloud object storage as storage layer. In addition, the Hive metastore runs as a separate service on the cluster and is accessible for any Spark application.
 
-```
-/opt/spark/sbin/start-thriftserver.sh --master k8s://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT} --conf spark.kubernetes.container.image=spark:1.0.0 --conf spark.kubernetes.executor.secrets.google-credentials=/etc/google --conf spark.kubernetes.authenticate.driver.serviceAccountName=default --conf spark.driver.extraClassPath=/opt/hive/lib/mysql-connector-java-8.0.26.jar --hiveconf javax.jdo.option.ConnectionPassword=${HIVE_USER_PWD} --conf spark.driver.host=$(hostname -I) --conf spark.sql.warehouse.dir=/opt/spark-warehouse --packages com.google.cloud.bigdataoss:gcs-connector:hadoop3-2.2.0 --conf spark.jars=/tmp/gcs-connector-hadoop3-latest.jar --conf spark.hadoop.hive.metastore.uris=thrift://metastore2:9083 --conf spark.kubernetes.driver.volumes.persistentVolumeClaim.spark-warehouse-volume.mount.path=/opt/spark-warehouse --conf spark.kubernetes.executor.volumes.persistentVolumeClaim.spark-warehouse-volume.mount.path=/opt/spark-warehouse --conf spark.kubernetes.driver.volumes.persistentVolumeClaim.spark-warehouse-volume.options.claimName=spark-warehouse-claim --conf spark.kubernetes.executor.volumes.persistentVolumeClaim.spark-warehouse-volume.options.claimName=spark-warehouse-claim
-```
+Objectives of this project
+1. Create reusable implementation for any data engineering projects.
+2. Consolidate implementation knowledge in a single place for others to use.
+
+Most of the personal projects and prototypes share a common infrastructure/process where you want to avoid repeating yourself in the setup. Maintaining that infrastructure and imposing some form of convention will surely help improve iteration speed of any project. Furthermore, the contents of this repository and documentation can be useful to share with the general public.
+
+## Prerequisites
+To run this setup local machine
+1. Dependencies installed: Docker, Minikube.
+2. Spark distribution of >= 2.3.
+
+When using GCS as storage layer, a service account (JSON) needs to be provided. See secrets section below. 
+
+## Getting Started
+
+### 1. Setting secrets
+Use Kubernetes secrets to provide service account and password settings
+
+Google Cloud Platform:
+
+`$ kubectl create secret generic google-credentials --from-file=credentials.json=/path/to/gcp/credentials.json`
+
+Set up the root user password for MySQL
+
+`$ kubectl create secret generic mysql --from-literal=password=some-secret-password`
+
+Set up the password for the Hive user.
+
+`$ kubectl create secret generic hive --from-literal=password=some-secret-password`
+
+### 2. Build Spark base image
+Spark ships with a Dockerfile used by this setup found in the `kubernetes/dockerfiles` directory. It also ships with a tool to create the required Docker images.
+ 
+```$ /path/to/spark/bin/docker-image-tool.sh -p kubernetes/dockerfiles/spark/bindings/python/Dockerfile -t 1.0.0 -u root build```
+
+## Contributing
+Suggestions, improvemnts and/or bug findings are more than welcome. Please create a branch and PR or issue where we can discuss proposed changes.
