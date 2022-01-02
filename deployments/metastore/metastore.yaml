@@ -11,18 +11,26 @@ spec:
       labels:
         app: metastore2
     spec: 
-      # initContainer: nc -vz mysql 3306
+      initContainers:
+        - name: check-mysql
+          image: busybox
+          command:
+            - sh
+            - -c
+            - nc -vz mysql 3306
       containers:
         - name: metastore2
           image: spark-thrift-server:0.1.0
           imagePullPolicy: Never
-          args:
-            - /bin/bash
-            - -c
-            - /opt/hive/bin/hive --service metastore --hiveconf javax.jdo.option.ConnectionPassword=${HIVE_USER_PWD}
+          command:
+            - /opt/init.sh
           ports:
             - name: metastore
               containerPort: 9083
+          volumeMounts:
+            - name: metastoreinit
+              mountPath: /opt/init.sh
+              subPath: init.sh
           env:
             - name: HIVE_CONF_DIR
               value: /opt/spark/conf
@@ -41,6 +49,11 @@ spec:
               port: metastore
             failureThreshold: 6
             periodSeconds: 20
+      volumes:
+        - name: metastoreinit
+          configMap:
+            name: metastore-initstore
+            defaultMode: 0777
 ---
 apiVersion: v1
 kind: Service
